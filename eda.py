@@ -9,9 +9,9 @@ big_df['avg_percent'] = (all_df['voter_percent'] + all_df['2018_vote_percent']) 
 big_df['low_turnout'] = [1 if x <= .35 else 0 for x in big_df['avg_percent']]
 big_df = pd.DataFrame(big_df[big_df['avg_percent']< .9])
 
-big_df = pd.DataFrame(big_df[['gini_coefficient','avg_percent','low_turnout','size_rank','asian_american_population','african_american_population','at_least_high_school_diploma',
+big_df = pd.DataFrame(big_df[['gini_coefficient','low_turnout','size_rank','asian_american_population','african_american_population','at_least_high_school_diploma',
                       'child_poverty_living_in_families_below_the_poverty_line','uninsured','production_transportation_and_material_moving_occupations',
-                      'poverty_rate_below_federal_poverty_threshold','construction_extraction_maintenance_and_repair_occupations','total_population',
+                      'poverty_rate_below_federal_poverty_threshold','construction_extraction_maintenance_and_repair_occupations',
                       'less_than_high_school','at_least_bachelor_s_degree','adults_65_and_older_living_in_poverty','unemployment','graduate_degree',
                       'latino_population','management_professional_and_related_occupations','sire_homogeneity','native_american_population',
                       'sales_and_office_occupations','white_not_latino_population']])

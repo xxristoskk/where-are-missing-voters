@@ -14,21 +14,23 @@ from sklearn.svm import LinearSVC
 ## Put labels on all the states to make a multiclass variable
 
 ##Define target and labels
-target = one_hot['low_turnout']
-one_hot.drop('low_turnout',axis=1,inplace=True)
-X = one_hot
+target = big_df['low_turnout']
+big_df.drop('low_turnout',axis=1,inplace=True)
+X = big_df
 ## Set up training data
-xTrain,xTest,yTrain,yTest = train_test_split(X,target,test_size=.3)
+xTrain,xTest,yTrain,yTest = train_test_split(X,target,test_size=.3, random_state=10)
 ## Scale the training data
 from sklearn.preprocessing import StandardScaler
 scaler = StandardScaler()
 scaledTrained = scaler.fit_transform(xTrain)
 scaledTest = scaler.fit_transform(xTest)
-scaled_df_train = pd.DataFrame(scaledTrained,columns=one_hot.columns)
+scaled_df_train = pd.DataFrame(scaledTrained,columns=big_df.columns)
 # scaled_df_train.head()
 
+
+
 ## Run models function to calculate the scores from Random Forest, SVM, Decision Tree, and Logistic Regression
-run_models(one_hot,one_hot,target)
+run_models(big_df,big_df,target)
 
 
 ##################################################################
@@ -43,7 +45,7 @@ def create_dict(df,col):
 ###############################################################
 def run_models(df,X,y):
     ## Set up training data
-    xTrain,xTest,yTrain,yTest = train_test_split(X,y,test_size=.25)
+    xTrain,xTest,yTrain,yTest = train_test_split(X,y,test_size=.2)
     ## Decision Tree
     dt = DecisionTreeClassifier()
     dt.fit(X=xTrain,y=yTrain)
@@ -53,14 +55,10 @@ def run_models(df,X,y):
     lr.fit(xTrain,yTrain)
     lr_pred = lr.predict(xTest)
     # svm
-    svm = Pipeline([
-                      ("scaler", StandardScaler()),
-                      ("linear_svc", LinearSVC(C=1, loss="hinge")),
-                      ])
-
+    svm = LinearSVC(C=1, loss="hinge",random_state=10)
     svm.fit(xTrain,yTrain)
     svm_p = svm.predict(xTest)
-    rf = RandomForestClassifier()
+    rf = RandomForestClassifier(n_estimators=20,random_state=10)
     rf.fit(xTrain,yTrain)
     rf_y = rf.predict(xTest)
     # Calculate scores
