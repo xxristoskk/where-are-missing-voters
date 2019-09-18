@@ -2,37 +2,148 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-from sklearn.model_selection import train_test_split
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split,GridSearchCV
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.metrics import f1_score, precision_score, recall_score, accuracy_score, roc_curve, auc, roc_auc_score,confusion_matrix
+from sklearn.metrics import f1_score, precision_score, classification_report,recall_score, accuracy_score, roc_curve, auc, roc_auc_score,confusion_matrix
 from sklearn.linear_model import LogisticRegression
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import RandomForestClassifier, BaggingClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.svm import LinearSVC
 
 ## Improvements to make:
 ## Put labels on all the states to make a multiclass variable
 
+idk = GridSearchCV(RandomForestClassifier(), param_grid={'n_estimators': [10, 100, 1000]})
+idk.fit(xTrain,yTrain)
+pd.DataFrame(idk.cv_results_)
+
+idk.score(xTest,yTest)
+
+q = idk.predict(xTest)
+calc_scores('boosted',yTest,q)
+
 ##Define target and labels
 target = big_df['low_turnout']
 big_df.drop('low_turnout',axis=1,inplace=True)
 X = big_df
 ## Set up training data
-xTrain,xTest,yTrain,yTest = train_test_split(X,target,test_size=.3, random_state=10)
+xTrain,xTest,yTrain,yTest = train_test_split(X,target,test_size=.25)
 ## Scale the training data
-from sklearn.preprocessing import StandardScaler
-scaler = StandardScaler()
-scaledTrained = scaler.fit_transform(xTrain)
-scaledTest = scaler.fit_transform(xTest)
-scaled_df_train = pd.DataFrame(scaledTrained,columns=big_df.columns)
+# from sklearn.preprocessing import StandardScaler
+# scaler = StandardScaler()
+# scaledTrained = scaler.fit_transform(xTrain)
+# scaledTest = scaler.fit_transform(xTest)
+# scaled_df_train = pd.DataFrame(scaledTrained,columns=big_df.columns)
 # scaled_df_train.head()
 
 
+rf = RandomForestClassifier(max_features=7,max_depth=3,min_samples_split=.3,min_samples_leaf=.3)
+rf.fit(xTrain,yTrain)
+rf_y = rf.predict(xTest)
 
 ## Run models function to calculate the scores from Random Forest, SVM, Decision Tree, and Logistic Regression
 run_models(big_df,big_df,target)
 
+################################################################
+## Training the Classifier
+# Identify the optimal tree depth for given data
+depth = np.linspace(1, 32, 32, endpoint=True)
+train_results = []
+test_results = []
+for n in depth:
+    dt = DecisionTreeClassifier(criterion='entropy',max_depth=n)
+    dt.fit(xTrain,yTrain)
+    #train
+    train_pred = dt.predict(xTrain)
+    fp, tp, thresholds = roc_curve(yTrain,train_pred)
+    roc_auc = auc(fp,tp)
+    train_results.append(roc_auc)
+    #test
+    test_pred = dt.predict(xTest)
+    fp,tp,thresholds = roc_curve(yTest,test_pred)
+    roc_auc = auc(fp,tp)
+    test_results.append(roc_auc)
 
+plt.figure(figsize=(12,6))
+plt.plot(depth, train_results, 'b', label='Train AUC')
+plt.plot(depth, test_results, 'r', label='Test AUC')
+plt.ylabel('AUC score')
+plt.xlabel('Tree depth')
+plt.legend()
+plt.show()
+
+# Identify the optimal min-samples-split for given data
+# Identify the optimal min-samples-split for given data
+min_samples_splits = np.linspace(0.1, 1.0, 10, endpoint=True)
+train_results = []
+test_results = []
+for min_samples_split in min_samples_splits:
+   dt = DecisionTreeClassifier(criterion='entropy', min_samples_split=min_samples_split)
+   dt.fit(xTrain, yTrain)
+   train_pred = dt.predict(xTrain)
+   false_positive_rate, true_positive_rate, thresholds =    roc_curve(yTrain, train_pred)
+   roc_auc = auc(false_positive_rate, true_positive_rate)
+   train_results.append(roc_auc)
+   y_pred = dt.predict(xTest)
+   false_positive_rate, true_positive_rate, thresholds = roc_curve(yTest, y_pred)
+   roc_auc = auc(false_positive_rate, true_positive_rate)
+   test_results.append(roc_auc)
+plt.figure(figsize=(12,6))
+plt.plot(min_samples_splits, train_results, 'b', label='Train AUC')
+plt.plot(min_samples_splits, test_results, 'r', label='Test AUC')
+plt.xlabel('Min. Sample splits')
+plt.legend()
+plt.show()
+
+min_samples_leafs = np.linspace(0.1, 0.5, 5, endpoint=True)
+train_results = []
+test_results = []
+for min_samples_leaf in min_samples_leafs:
+   dt = DecisionTreeClassifier(criterion='entropy', min_samples_leaf=min_samples_leaf)
+   dt.fit(xTrain, yTrain)
+   train_pred = dt.predict(xTrain)
+   false_positive_rate, true_positive_rate, thresholds = roc_curve(yTrain, train_pred)
+   roc_auc = auc(false_positive_rate, true_positive_rate)
+   train_results.append(roc_auc)
+   y_pred = dt.predict(xTest)
+   false_positive_rate, true_positive_rate, thresholds = roc_curve(yTest, y_pred)
+   roc_auc = auc(false_positive_rate, true_positive_rate)
+   test_results.append(roc_auc)
+
+
+plt.figure(figsize=(12,6))
+plt.plot(min_samples_leafs, train_results, 'b', label='Train AUC')
+plt.plot(min_samples_leafs, test_results, 'r', label='Test AUC')
+plt.ylabel('AUC score')
+plt.xlabel('Min. Sample Leafs')
+plt.legend()
+plt.show()
+
+# Find the best value for optimal maximum feature size
+max_features = list(range(1,xTrain.shape[1]))
+train_results = []
+test_results = []
+for max_feature in max_features:
+   dt = DecisionTreeClassifier(criterion='entropy', max_features=max_feature)
+   dt.fit(xTrain, yTrain)
+   train_pred = dt.predict(xTrain)
+   false_positive_rate, true_positive_rate, thresholds = roc_curve(yTrain, train_pred)
+   roc_auc = auc(false_positive_rate, true_positive_rate)
+   train_results.append(roc_auc)
+   y_pred = dt.predict(xTest)
+   false_positive_rate, true_positive_rate, thresholds = roc_curve(yTest, y_pred)
+   roc_auc = auc(false_positive_rate, true_positive_rate)
+   test_results.append(roc_auc)
+
+
+plt.figure(figsize=(12,6))
+plt.plot(max_features, train_results, 'b', label='Train AUC')
+plt.plot(max_features, test_results, 'r', label='Test AUC')
+plt.ylabel('AUC score')
+plt.xlabel('max features')
+plt.legend()
+plt.show()
 ##################################################################
 def create_dict(df,col):
     """creates a list of df's"""
@@ -42,6 +153,7 @@ def create_dict(df,col):
         df_list.append(df[df[col]==val])
     return df_list
 ####################################################################
+run_models(big_df,X,target)
 ###############################################################
 def run_models(df,X,y):
     ## Set up training data
@@ -58,7 +170,7 @@ def run_models(df,X,y):
     svm = LinearSVC(C=1, loss="hinge",random_state=10)
     svm.fit(xTrain,yTrain)
     svm_p = svm.predict(xTest)
-    rf = RandomForestClassifier(n_estimators=20,random_state=10)
+    rf = RandomForestClassifier(n_estimators=100)
     rf.fit(xTrain,yTrain)
     rf_y = rf.predict(xTest)
     # Calculate scores
@@ -119,7 +231,7 @@ def calc_scores(model,yTest,yPred):
 
 ## Function that will run models on every county
 ## Needs more work
-def run_models(all):
+def rm(all):
     for d in all:
         best_precision = 0
         best_f1 = 0

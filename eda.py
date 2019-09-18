@@ -8,7 +8,7 @@ big_df = pd.DataFrame(all_df.drop(['voter_percent','2018_vote_percent'],axis=1))
 big_df['avg_percent'] = (all_df['voter_percent'] + all_df['2018_vote_percent']) / 2
 big_df['low_turnout'] = [1 if x <= .35 else 0 for x in big_df['avg_percent']]
 big_df = pd.DataFrame(big_df[big_df['avg_percent']< .9])
-
+big_df.low_turnout.sum()
 big_df = pd.DataFrame(big_df[['gini_coefficient','low_turnout','size_rank','asian_american_population','african_american_population','at_least_high_school_diploma',
                       'child_poverty_living_in_families_below_the_poverty_line','uninsured','production_transportation_and_material_moving_occupations',
                       'poverty_rate_below_federal_poverty_threshold','construction_extraction_maintenance_and_repair_occupations',
@@ -16,8 +16,7 @@ big_df = pd.DataFrame(big_df[['gini_coefficient','low_turnout','size_rank','asia
                       'latino_population','management_professional_and_related_occupations','sire_homogeneity','native_american_population',
                       'sales_and_office_occupations','white_not_latino_population']])
 len(big_df.columns)
-one_hot = pd.get_dummies(big_df)
-len(one_hot.columns)
+
 ## plot eda
 features = ['gini_coefficient','avg_percent','low_turnout','size_rank','asian_american_population','african_american_population','at_least_high_school_diploma',
                       'child_poverty_living_in_families_below_the_poverty_line','uninsured','production_transportation_and_material_moving_occupations',
@@ -27,18 +26,19 @@ features = ['gini_coefficient','avg_percent','low_turnout','size_rank','asian_am
                       'sales_and_office_occupations','white_not_latino_population']
 len(features)
 
-n = 5
+n = 2
 row_groups= [features[i:i+n] for i in range(0, len(features), n)]
 for i in row_groups:
-    pp = sns.pairplot(data=one_hot,y_vars='avg_percent',x_vars=i, kind="reg", height=3)
+    pp = sns.pairplot(data=big_df,y_vars='avg_percent',x_vars=i, kind="reg", height=3)
 
 
 ## corr heatmap
-corr = one_hot[['gini_coefficient','low_turnout','size_rank','asian_american_population','african_american_population','at_least_high_school_diploma',
+corr = big_df[['gini_coefficient','low_turnout','size_rank','asian_american_population','african_american_population','at_least_high_school_diploma',
                       'child_poverty_living_in_families_below_the_poverty_line','uninsured','production_transportation_and_material_moving_occupations',
-                      'poverty_rate_below_federal_poverty_threshold','construction_extraction_maintenance_and_repair_occupations','total_population',
+                      'poverty_rate_below_federal_poverty_threshold','construction_extraction_maintenance_and_repair_occupations',
                       'less_than_high_school','at_least_bachelor_s_degree','adults_65_and_older_living_in_poverty','unemployment','graduate_degree',
-                      'latino_population','management_professional_and_related_occupations','native_american_population']].corr()
+                      'latino_population','management_professional_and_related_occupations','sire_homogeneity','native_american_population',
+                      'sales_and_office_occupations','white_not_latino_population']].corr()
 def CorrMtx(df, dropDuplicates = True):
 
     # Your dataset is already a correlation matrix.
@@ -72,7 +72,8 @@ def CorrMtx(df, dropDuplicates = True):
 
 CorrMtx(corr, dropDuplicates = True)
 # df['less_than_high_school'] = np.log(df['less_than_high_school'])
-sns.jointplot(x=big_df.poverty_rate_below_federal_poverty_threshold,y=big_df['avg_percent'],data=all_df,kind='reg')
+big_df['sire_norm'] = (big_df.sire_homogeneity - big_df.sire_homogeneity.mean()) / big_df.sire_homogeneity.std()
+sns.jointplot(x=big_df.sire_norm,y=big_df['white_not_latino_population'],data=all_df,kind='reg')
 
 
 big_df.sort_values(by='avg_percent',ascending=False)
@@ -96,12 +97,11 @@ pc4 = pca.components_[4]
 pc5 = pca.components_[5]
 
 
-index= one_hot.columns
+index= big_df.columns
 structure_loading_1 = pc1* np.sqrt(eig_values[0])
 str_loading_1 = pd.Series(structure_loading_1, index=index)
 str_loading_1
 
-fig = plt.figure(figsize=(12,12))
-ax = sns.barplot(index,pca.explained_variance_ratio_)
+sns.barplot(index,pca.explained_variance_ratio_)
 
 plt.plot(np.cumsum(pca.explained_variance_ratio_))

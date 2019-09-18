@@ -93,3 +93,5 @@ all_df = pd.merge(elect18,df,how='inner',on=['county','state'])
 ## Ignore for now
 
 all_df['2018_vote_percent'] = all_df.total_votes_senate18 / all_df.total_population
+
+all_df.info()
