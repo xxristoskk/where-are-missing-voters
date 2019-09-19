@@ -36,11 +36,12 @@ elect18.columns = ['state','county','total_votes_senate18']
 elect18.county = elect18.county + ' County'
 elect18.sort_values('county',inplace=True)
 elect18.set_index('county',inplace=True)
-
+elect18.shape
 
 ##Election 2016 dataset
 elect16 = pd.read_json('/home/xristsos/Downloads/usa-2016-presidential-election-by-county.json')
 
+elect16.shape
 ## Fields column holds dictionaries for each county
 df = pd.DataFrame(data=[x for x in elect16['fields']])
 df.drop(['state','geo_shape','temp_bins'],axis=1,inplace=True)
@@ -75,23 +76,19 @@ df['non_voters_percent'] = df.non_voters / df.total_population
 
 ##Fill and remove missing data
 df.teen_births.fillna(df.teen_births.median(),inplace=True)
-def remove_cols(df):
-    for col in df.columns:
-        if '16' in col:
-            df.drop(col,axis=1,inplace=True)
-        elif df[col].isna().sum() > 40:
-            df.drop(col,axis=1,inplace=True)
-remove_cols(df)
+# def remove_cols(df):
+#     for col in df.columns:
+#         if '16' in col:
+#             df.drop(col,axis=1,inplace=True)
+#         elif df[col].isna().sum() > 40:
+#             df.drop(col,axis=1,inplace=True)
+# remove_cols(df)
 df.voter_percent.fillna(df.voter_percent.mean(),inplace=True)
 df.non_voters_percent.fillna(df.non_voters_percent.mean(),inplace=True)
 
 ## Join new data frames
-all_df = pd.merge(elect18,df,how='inner',on=['county','state'])
-
-
-## Not sure
-## Ignore for now
-
+all_df = pd.merge(elect18,df,how='right',on=['county','state'])
+all_df.shape
+all_df.isna().sum()
+all_df.head()
 all_df['2018_vote_percent'] = all_df.total_votes_senate18 / all_df.total_population
-
-all_df.info()
