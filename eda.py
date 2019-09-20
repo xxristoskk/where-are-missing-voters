@@ -113,7 +113,7 @@ pc4 = pca.components_[4]
 pc5 = pca.components_[5]
 
 
-index= big_df.columns
+index= xTest.columns
 structure_loading_1 = pc1* np.sqrt(eig_values[0])
 str_loading_1 = pd.Series(structure_loading_1, index=index)
 str_loading_1
