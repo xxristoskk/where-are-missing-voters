@@ -1,11 +1,9 @@
 import pandas as pd
 import numpy as np
-import statsmodels.api as sm
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-
-## Election 2018 votes
+## Create and clean Election 2018 dataframe
 elect18 = pd.read_csv('/home/xristsos/Documents/2016 election/national-files/us-senate-wide.csv')
 elect18 = pd.DataFrame(elect18[['state','county','total.votes']])
 elect18.columns = ['state','county','total_votes_senate18']
@@ -14,12 +12,17 @@ elect18.sort_values('county',inplace=True)
 elect18.set_index('county',inplace=True)
 elect18.shape
 elect18.head()
-##Election 2016 dataset
+## Create and clean Election 2016 dataframe
 elect16 = pd.read_json('/home/xristsos/Downloads/usa-2016-presidential-election-by-county.json')
 elect16.shape
-
-## Converting all the dictionaries in Fields columns to one data frame
+elect16.head()
+### Bulk of the dataframe was embeded in a dictionary in the feilds column
 df = pd.DataFrame(data=[x for x in elect16['fields']])
+### Save a copy for geo info
+geo_df = df['geo_shape'].copy()
+sorted(list(df.index))
+
+## Fill or drop null values
 df.drop(['state','geo_shape','temp_bins'],axis=1,inplace=True)
 df.rename(columns={'st':'state'},inplace=True)
 df.county = [x.split(', ') for x in df.county]
@@ -61,7 +64,12 @@ df.voter_percent.fillna(df.voter_percent.mean(),inplace=True)
 df.non_voters_percent.fillna(df.non_voters_percent.mean(),inplace=True)
 df.tail()
 ## Join new data frames
-all_df = pd.merge(elect18,df,how='inner',on=['county','state'])
+df = pd.merge(elect18,df,how='inner',on=['county','state'])
 
-all_df.drop_duplicates(inplace=True)
-all_df['2018_vote_percent'] = all_df.total_votes_senate18 / all_df.total_population
+df.drop_duplicates(inplace=True)
+df['2018_vote_percent'] = df.total_votes_senate18 / df.total_population
+df.head()
+
+### Future geo cleaning
+geo = pd.read_json('/home/xristsos/flatiron/projects/where-are-missing-voters/data/gz_2010_us_050_00_20m.json')
+geo.head()
