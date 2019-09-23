@@ -22,18 +22,18 @@ Based on the work from Tynan Challenor, I choose to start testing models with Lo
 ### Model performance
 I did a grid search to find the best parameters for the two models that had the better initial test performance. To get a quick understanding of what these scores mean, I made a reference of the summary.
 
-* Accuracy: overall accuracy
-* Precision: percent of positive predictions out of overall true-positives
-* Recall: percent of true low low-turnouts that were predicted as low-turnouts
-* F1: weighted accuracy between the precision and recall scores
-* ROC AUC score: optimal percent of true-positive rate vs. false positive rate
+* **Accuracy**: overall accuracy
+* **Precision**: percent of positive predictions out of overall true-positives
+* **Recall**: percent of true low low-turnouts that were predicted as low-turnouts
+* **F1**: weighted accuracy between the precision and recall scores
+* **ROC AUC score**: optimal percent of true-positive rate vs. false positive rate
 
 #### Logistic Regression
-  *Precision: 80%
-  *F1: 74%
-  *Accuracy: 81%
-  *Recall: 68%
-  *ROC_AUC: 79%
+  * Precision: 80%
+  * F1: 74%
+  * Accuracy: 81%
+  * Recall: 68%
+  * ROC_AUC: 79%
 
 #### Random Forest
   * Accuracy: 82%
@@ -43,11 +43,11 @@ I did a grid search to find the best parameters for the two models that had the 
   * ROC AUC score: %80
 
 #### XGBoost
-  * Accuracy: 83%
+  * Accuracy: **83%
   * Precision: 83%
-  * Recall: 73%
-  * F1: 78%
-  * ROC AUC score: %82
+  * Recall: **73%
+  * F1: **78%
+  * ROC AUC score: **%82
 
 ### Visualized ROC
 ![img](https://github.com/xxristoskk/where-are-missing-voters/blob/master/visuals/roc_curve.png)
