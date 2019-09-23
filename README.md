@@ -43,14 +43,22 @@ I did a grid search to find the best parameters for the two models that had the 
   * ROC AUC score: %80
 
 #### XGBoost
-  * Accuracy: **83%
+  * Accuracy: **83%**
   * Precision: 83%
-  * Recall: **73%
-  * F1: **78%
-  * ROC AUC score: **%82
+  * Recall: **73%**
+  * F1: **78%**
+  * ROC AUC score: **%82**
 
 ### Visualized ROC
 ![img](https://github.com/xxristoskk/where-are-missing-voters/blob/master/visuals/roc_curve.png)
 
 ### Most important features considered for XGBoost model
 ![img](https://github.com/xxristoskk/where-are-missing-voters/blob/master/visuals/important_feats.png)
+
+## Conclusions and Final Thoughts
+* Model performance
+ * The best results from the XGBoost are promising for future work
+ * The overall socioeconomic status of a county has a strong correlation with voter turnout
+* Suggestions for better results
+ * 1,900+ counties were included out of the 3,000+ in the country -- get more observations
+ * Making economic features more precise by grouping median annual income
