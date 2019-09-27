@@ -4,14 +4,29 @@ from sklearn.metrics import f1_score, precision_score, classification_report,rec
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier, BaggingClassifier
 from sklearn.pipeline import Pipeline
-from sklearn.svm import LinearSVC
+from sklearn.svm import SVC
 from xgboost import XGBClassifier
 
 
+def grid_search(xTrain,xTest,yTrain,yTest):
+    gs = GridSearchCV(estimator=SVC(),
+                     param_grid={'C':[1,5,10,20,50,100,500,1000,50000,1000000],
+                                 'kernel': ['linear','rfb'],
+                                 'probability': True,},
+                     cv=4,n_jobs=-1,scoring='balanced_accuracy')
+    model = gs.fit(xTrain,yTrain)
+    print(f'Best score: {model.best_score_}')
+    print(f'Best parms: {model.best_params_}')
 
 
 
-# XGboot !!
+## SVM model
+svm = SVC(C=10, kernel='linear')
+svm.fit(xTrain,yTrain)
+svm_p = svm.predict(xTest)
+
+
+# XGboost !!
 
 xg = XGBClassifier(n_estimators=1000,max_depth=5,min_samples_split=.3,max_features=6)
 xg.fit(xTrain,yTrain)
@@ -79,7 +94,6 @@ plt.xlabel('Tree depth')
 plt.legend()
 plt.show()
 
-# Identify the optimal min-samples-split for given data
 # Identify the optimal min-samples-split for given data
 min_samples_splits = np.linspace(0.1, 1.0, 10, endpoint=True)
 train_results = []
@@ -162,37 +176,6 @@ def create_dict(df,col):
 run_models(valid_df,valid_df,target)
 run_models(valid_df,xTest,yTest)
 ###############################################################
-def run_models(df,X,y):
-    ## Set up training data
-    xTrain,xTest,yTrain,yTest = train_test_split(X,y,test_size=.2)
-
-    # Logistic Regression
-    lr = LogisticRegression()
-    lr.fit(xTrain,yTrain)
-    lr_pred = lr.predict(xTest)
-    # svm
-    svm = LinearSVC(C=20, loss="hinge",random_state=10)
-    svm.fit(xTrain,yTrain)
-    svm_p = svm.predict(xTest)
-    #Random Forest
-    rf = RandomForestClassifier(n_estimators=1000,max_depth=5,min_samples_split=.3,max_features=6)
-    rf.fit(xTrain,yTrain)
-    rf_y = rf.predict(xTest)
-    #xgboost
-    xg = XGBClassifier(n_estimators=1000,max_depth=5,min_samples_split=.3,max_features=6)
-    xg.fit(xTrain,yTrain)
-    xg_y = xg.predict(xTest)
-    # Calculate scores
-    lr_s = calc_scores(yTest,lr_pred)
-    svm_s = calc_scores(yTest,svm_p)
-    rf_s = calc_scores(yTest,rf_y)
-    xg_s = calc_scores(yTest,xg_y)
-    scores = [lr_s,svm_s,rf_s,xg_s]
-    for j in scores:
-        print(f'Precision: {j[0]}, F1: {j[1]}, Accuracy: {j[2]}, Recall: {j[3]}, ROC_AUC: {j[4]}')
-
-
-
 ## Calculates all the scores and returns them in a list that includes the model name
 ## Needs more work
 def calc_scores(yTest,yPred):
