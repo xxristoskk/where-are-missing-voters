@@ -6,50 +6,6 @@ from sklearn.pipeline import Pipeline
 from sklearn.svm import SVC
 from xgboost import XGBClassifier
 
-<<<<<<< HEAD
-=======
-
-def grid_search(xTrain,xTest,yTrain,yTest):
-    gs = GridSearchCV(estimator=SVC(),
-                     param_grid={'C':[1,5,10,20,50,100,500,1000,50000,1000000],
-                                 'kernel': ['linear','rfb'],
-                                 'probability': True,},
-                     cv=4,n_jobs=-1,scoring='balanced_accuracy')
-    model = gs.fit(xTrain,yTrain)
-    print(f'Best score: {model.best_score_}')
-    print(f'Best parms: {model.best_params_}')
-
-
-
-## SVM model
-svm = SVC(C=10, kernel='linear')
-svm.fit(xTrain,yTrain)
-svm_p = svm.predict(xTest)
-
-
-# XGboost !!
-
-xg = XGBClassifier(n_estimators=1000,max_depth=5,min_samples_split=.3,max_features=6)
-xg.fit(xTrain,yTrain)
-xg_pred = xg.predict(xTest)
-confusion_matrix(yTest,xg_pred)
-calc_scores(yTest,xg_pred)
-xg_big = xg.predict(valid_df)
-calc_scores(target,xg_big)
-confusion_matrix(target,xg_big)
-valid_df['predictions'] = xg_big
-valid_df.head()
-## GredSearch for random forest
-idk = GridSearchCV(RandomForestClassifier(), param_grid={'n_estimators': [10, 100, 1000]})
-idk.fit(xTrain,yTrain)
-pd.DataFrame(idk.cv_results_)
-
-idk.score(xTest,yTest)
-
-q = idk.predict(xTest)
-calc_scores('boosted',yTest,q)
-
->>>>>>> drafts
 ## Set up training data
 X = features
 xTrain,xTest,yTrain,yTest = train_test_split(X,target,test_size=.35)
@@ -130,24 +86,8 @@ plt.legend()
 plt.show()
 
 ##################################################################
-<<<<<<< HEAD
 
 ## Calculates all the scores of a model and prints them
-=======
-def create_dict(df,col):
-    """creates a list of df's"""
-    unique_col = df[col].unique()
-    df_list = []
-    for val in unique_col:
-        df_list.append(df[df[col]==val])
-    return df_list
-####################################################################
-run_models(valid_df,valid_df,target)
-run_models(valid_df,xTest,yTest)
-###############################################################
-## Calculates all the scores and returns them in a list that includes the model name
-## Needs more work
->>>>>>> drafts
 def calc_scores(yTest,yPred):
     print('Precision: ', precision_score(yTest,yPred))
     print('F1: ', f1_score(yTest,yPred))
