@@ -7,7 +7,7 @@ Tynan Challenor from Stanford University published their finding in a paper call
 ### Exploring The Data
 After merging the sources together and creating a definition for  the target variable, I performed some exploratory data analysis. This process helped me choose the features needed for the model to learn what is and isn't a low-turnout county.
 
-![pairplot](https://github.com/xxristoskk/where-are-missing-voters/blob/master/visuals/pairplot2.png)
+![pairplot](https://github.com/xxristoskk/where-are-missing-voters/blob/master/visuals/pairplot.png)
 
 ![pairplot](https://github.com/xxristoskk/where-are-missing-voters/blob/master/visuals/pairplot2.png)
 
